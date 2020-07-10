@@ -396,7 +396,11 @@ genrule(
         # Copy templates for code snippets in getting started guide
         CODE_DIR=$$PWD/build/docs/source/getting-started/code/
         mkdir -p $$CODE_DIR
+
         tar -zxf $(location //templates:templates-tarball) -C $$CODE_DIR
+        # Undo project name templating since we don’t want that to show up
+        # in the docs.
+        find $$CODE_DIR -name '*.template' -type f -exec sh -c 'mv "$$0" "$${{0%.template}}" && sed -i "s/__PROJECT_NAME__/create-daml-app/g" "$${{1%.template}}"' {{}} ';'
         # Copy create-daml-app tests
         mkdir $$CODE_DIR/testing
         cp $(location //templates:create-daml-app-test-resources/index.test.ts) $$CODE_DIR/testing
